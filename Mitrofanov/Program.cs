@@ -13,27 +13,10 @@ namespace Mitrofanov
     {
         public static void Main(string[] args)
         {
-            // Add services to the container.
-            builder.Services.AddRazorPages();
+            var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseMiddleware<TestMiddleware>();
-            app.MapControllers();
-
-
-            app.Run();
+            builder.Services.Configure<JwtConfiguration>(
+                builder.Configuration.GetSection("Jwt"));
         }
     }
 }
