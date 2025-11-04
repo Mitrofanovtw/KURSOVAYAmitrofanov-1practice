@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using StudioStatistic.Models;
+using StudioStatistic.Repositories;
 using System.Text;
 
 
@@ -21,6 +22,12 @@ namespace StudioStatistic
 
             builder.Services.AddDbContext<APIDBContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
+
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
+            builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+            builder.Services.AddScoped<IEngineersRepository, EngineersRepository>();
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+            builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
