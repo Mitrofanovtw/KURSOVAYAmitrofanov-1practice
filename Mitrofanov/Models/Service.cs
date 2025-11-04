@@ -2,15 +2,16 @@
 
 namespace StudioStatistic.Models
 {
-    public class Client
+    public class Service
     {
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required, MaxLength(100)]
         public string Name { get; set; } = null!;
 
-        public int QuantityOfVisits { get; set; } = 0;
+        [Required]
+        public decimal Price { get; set; }
 
         public List<Request> Requests { get; set; } = new();
     }

@@ -6,16 +6,23 @@ namespace StudioStatistic.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        public List<Client> Client { get; set; } = null!;
-        [Required]
-        public List<Services> Service { get; set; } = null!;
+
+        public int ClientId { get; set; }
+        public Client Client { get; set; } = null!;
+
+        public int EngineerId { get; set; }
+        public Engineers Engineer { get; set; } = null!;
+
+        public int ServiceId { get; set; }
+        public Service Service { get; set; } = null!;
 
         [MaxLength(200)]
         public string Description { get; set; } = string.Empty;
+
         [Required]
         public decimal Cost { get; set; }
+
         [Required]
-        public DateTime DateOfVisit { get; set; } = CreateRequest.RequestDateTime;
+        public DateTime DateOfVisit { get; set; }
     }
 }
