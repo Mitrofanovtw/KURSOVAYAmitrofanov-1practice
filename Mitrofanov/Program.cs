@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using StudioStatistic.Models;
 using StudioStatistic.Repositories;
+using StudioStatistic.Services;
 using System.Text;
+using AutoMapper;
 
 
 namespace StudioStatistic
@@ -28,6 +31,12 @@ namespace StudioStatistic
             builder.Services.AddScoped<IEngineersRepository, EngineersRepository>();
             builder.Services.AddScoped<IAdminRepository, AdminRepository>();
             builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddScoped<IClientService, ClientService>();
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -99,7 +108,7 @@ namespace StudioStatistic
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseMiddleware<GlobalExceptionMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
