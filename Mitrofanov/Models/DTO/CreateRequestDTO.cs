@@ -1,11 +1,13 @@
-﻿namespace StudioStatistic.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StudioStatistic.Models.DTO
 {
     public class CreateRequestDto
     {
-        public int ClientId { get; set; }
-        public int EngineerId { get; set; }
-        public int ServiceId { get; set; }
+        [Required] public int ClientId { get; set; }
+        [Required] public int EngineerId { get; set; }
+        [Required] public int ServiceId { get; set; }
+        [Required] public DateTime DateOfVisit { get; set; }
         public string? Description { get; set; }
-        public DateTime DateOfVisit { get; set; }
     }
 }

@@ -11,12 +11,16 @@ namespace StudioStatistic
         {
             CreateMap<Client, ClientDto>();
             CreateMap<ClientDto, Client>();
+
             CreateMap<Engineers, EngineerDto>();
             CreateMap<CreateEngineerDto, Engineers>();
+
             CreateMap<Service, ServiceDto>();
             CreateMap<CreateServiceDto, Service>();
+
             CreateMap<Admin, AdminDto>();
             CreateMap<CreateAdminDto, Admin>();
+
             CreateMap<Request, RequestDto>()
                 .ForMember(d => d.ClientName, o => o.MapFrom(s => s.Client.Name))
                 .ForMember(d => d.EngineerName, o => o.MapFrom(s => s.Engineer.Name))

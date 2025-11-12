@@ -34,6 +34,10 @@ namespace StudioStatistic
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddScoped<IClientService, ClientService>();
+            builder.Services.AddScoped<IRequestService, RequestService>();
+            builder.Services.AddScoped<IEngineerService, EngineerService>();
+            builder.Services.AddScoped<IServiceService, ServiceService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

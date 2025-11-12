@@ -1,4 +1,4 @@
-﻿namespace StudioStatistic.DTO
+﻿namespace StudioStatistic.Models.DTO
 {
     public class RequestDto
     {

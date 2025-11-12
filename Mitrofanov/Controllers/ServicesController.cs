@@ -1,47 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StudioStatistic.DTO;
-using StudioStatistic.Models.DTO;
 using StudioStatistic.Services;
+using StudioStatistic.Models.DTO;
 
 namespace StudioStatistic.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ClientsController : ControllerBase
+    public class ServicesController : ControllerBase
     {
-        private readonly IClientService _service;
+        private readonly IServiceService _service;
 
-        public ClientsController(IClientService service)
+        public ServicesController(IServiceService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Получить список всех клиентов
+        /// Получить все услуги студии
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClientDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetAll()
         {
-            var clients = await _service.GetAllAsync();
-            return Ok(clients);
+            var services = await _service.GetAllAsync();
+            return Ok(services);
         }
 
         /// <summary>
-        /// Получить клиента по ID
+        /// Получить услугу по ID
         /// </summary>
         [HttpGet("{id}")]
-        public async Task<ActionResult<ClientDto>> GetById(int id)
+        public async Task<ActionResult<ServiceDto>> GetById(int id)
         {
-            var client = await _service.GetByIdAsync(id);
-            if (client == null) return NotFound();
-            return Ok(client);
+            var service = await _service.GetByIdAsync(id);
+            return service == null ? NotFound() : Ok(service);
         }
 
         /// <summary>
-        /// Создать нового клиента
+        /// Создать новую услугу (админ)
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<ClientDto>> Create([FromBody] ClientDto dto)
+        public async Task<ActionResult<ServiceDto>> Create([FromBody] CreateServiceDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var created = await _service.CreateAsync(dto);
@@ -49,10 +47,10 @@ namespace StudioStatistic.Controllers
         }
 
         /// <summary>
-        /// Обновить клиента
+        /// Обновить услугу
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ClientDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] ServiceDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try
@@ -67,7 +65,7 @@ namespace StudioStatistic.Controllers
         }
 
         /// <summary>
-        /// Удалить клиента
+        /// Удалить услугу
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
