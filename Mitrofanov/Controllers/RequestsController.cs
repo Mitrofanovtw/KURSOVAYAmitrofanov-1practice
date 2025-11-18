@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudioStatistic.Models.DTO;
 using StudioStatistic.Services;
 
 namespace StudioStatistic.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RequestsController : ControllerBase

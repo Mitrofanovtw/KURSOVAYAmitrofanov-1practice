@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 
-namespace StudioStatistic
+namespace StudioStatistic.Middleware
 {
     public class GlobalExceptionMiddleware
     {
@@ -13,7 +14,7 @@ namespace StudioStatistic
         }
 
         /// <summary>
-        /// Перехватывает все необработанные исключения
+        /// Перехватывает все необработанные исключения и ошибки аутентификации
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
@@ -27,20 +28,40 @@ namespace StudioStatistic
             }
         }
 
-        /// <summary>
-        /// Формирует структурированный JSON-ответ с ошибкой 500
-        /// </summary>
         private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new
+            var response = exception switch
             {
-                error = "Внутренняя ошибка сервера",
-                message = exception.Message,
-                timestamp = DateTime.UtcNow
+                UnauthorizedAccessException => new ErrorResponse
+                {
+                    Error = "Доступ запрещён",
+                    Message = "У вас нет прав для выполнения этого действия",
+                    Status = 403
+                },
+                SecurityTokenException or SecurityTokenExpiredException => new ErrorResponse
+                {
+                    Error = "Недействительный или истёкший токен",
+                    Message = "Токен недействителен или его срок действия истёк",
+                    Status = 401
+                },
+                InvalidOperationException ex when ex.Message.Contains("already exists") => new ErrorResponse
+                {
+                    Error = "Пользователь уже существует",
+                    Message = ex.Message,
+                    Status = 400
+                },
+                _ => new ErrorResponse
+                {
+                    Error = "Внутренняя ошибка сервера",
+                    Message = exception.Message,
+                    Timestamp = DateTime.UtcNow,
+                    Status = 500
+                }
             };
+
+            context.Response.StatusCode = response.Status;
 
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
             {
@@ -49,5 +70,13 @@ namespace StudioStatistic
 
             return context.Response.WriteAsync(json);
         }
+    }
+
+    public class ErrorResponse
+    {
+        public string Error { get; set; } = null!;
+        public string? Message { get; set; }
+        public DateTime? Timestamp { get; set; }
+        public int Status { get; set; }
     }
 }
