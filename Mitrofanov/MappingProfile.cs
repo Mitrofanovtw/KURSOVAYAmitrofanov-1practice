@@ -2,6 +2,7 @@
 using StudioStatistic.DTO;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
+using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
 
 namespace StudioStatistic
 {
@@ -11,12 +12,15 @@ namespace StudioStatistic
         {
             CreateMap<Client, ClientDto>();
             CreateMap<ClientDto, Client>();
+            CreateMap<CreateClientDto, Client>();
 
             CreateMap<Engineers, EngineerDto>();
             CreateMap<CreateEngineerDto, Engineers>();
 
             CreateMap<Service, ServiceDto>();
             CreateMap<CreateServiceDto, Service>();
+            CreateMap<ServiceDto, Service>();
+            CreateMap<UpdateServiceDto, Service>();
 
             CreateMap<Admin, AdminDto>();
             CreateMap<CreateAdminDto, Admin>();

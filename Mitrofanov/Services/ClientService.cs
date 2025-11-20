@@ -37,7 +37,7 @@ namespace StudioStatistic.Services
         /// <summary>
         /// Создаёт нового клиента
         /// </summary>
-        public async Task<ClientDto> CreateAsync(ClientDto dto)
+        public async Task<ClientDto> CreateAsync(CreateClientDto dto)
         {
             var client = _mapper.Map<Client>(dto);
             var created = _repo.Create(client);

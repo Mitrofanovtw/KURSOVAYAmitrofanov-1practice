@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
+using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
 using StudioStatistic.Repositories;
 
 namespace StudioStatistic.Services
@@ -47,11 +48,12 @@ namespace StudioStatistic.Services
         /// <summary>
         /// Обновить услугу
         /// </summary>
-        public async Task<ServiceDto> UpdateAsync(int id, ServiceDto dto)
+        public async Task<ServiceDto> UpdateAsync(int id, UpdateServiceDto dto)
         {
             var service = _repo.GetById(id);
             if (service == null) throw new KeyNotFoundException("Услуга не найдена");
 
+            // Автоматический маппинг
             _mapper.Map(dto, service);
             var updated = _repo.Update(service);
             return _mapper.Map<ServiceDto>(updated);

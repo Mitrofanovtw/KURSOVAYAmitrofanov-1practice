@@ -41,7 +41,7 @@ namespace StudioStatistic.Controllers
         /// Создать нового клиента
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<ClientDto>> Create([FromBody] ClientDto dto)
+        public async Task<ActionResult<ClientDto>> Create([FromBody] CreateClientDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var created = await _service.CreateAsync(dto);

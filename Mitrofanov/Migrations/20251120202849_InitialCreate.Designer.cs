@@ -12,7 +12,7 @@ using StudioStatistic.Models;
 namespace StudioStatistic.Migrations
 {
     [DbContext(typeof(APIDBContext))]
-    [Migration("20251104134332_InitialCreate")]
+    [Migration("20251120202849_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -155,6 +155,34 @@ namespace StudioStatistic.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("StudioStatistic.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("StudioStatistic.Models.Request", b =>

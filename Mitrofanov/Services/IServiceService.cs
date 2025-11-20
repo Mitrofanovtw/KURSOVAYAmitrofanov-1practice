@@ -1,4 +1,5 @@
 ﻿using StudioStatistic.Models.DTO;
+using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
 
 namespace StudioStatistic.Services
 {
@@ -7,7 +8,7 @@ namespace StudioStatistic.Services
         Task<IEnumerable<ServiceDto>> GetAllAsync();
         Task<ServiceDto?> GetByIdAsync(int id);
         Task<ServiceDto> CreateAsync(CreateServiceDto dto);
-        Task<ServiceDto> UpdateAsync(int id, ServiceDto dto);
+        Task<ServiceDto> UpdateAsync(int id, UpdateServiceDto dto);
         Task<bool> DeleteAsync(int id);
     }
 }

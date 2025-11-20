@@ -1,16 +1,19 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudioStatistic.Middleware
 {
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly IWebHostEnvironment _environment;
 
-        public GlobalExceptionMiddleware(RequestDelegate next)
+        public GlobalExceptionMiddleware(RequestDelegate next, IWebHostEnvironment environment)
         {
             _next = next;
+            _environment = environment;
         }
 
         /// <summary>
@@ -28,7 +31,7 @@ namespace StudioStatistic.Middleware
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
 
@@ -52,10 +55,19 @@ namespace StudioStatistic.Middleware
                     Message = ex.Message,
                     Status = 400
                 },
+                DbUpdateException dbEx => new ErrorResponse
+                {
+                    Error = "Ошибка базы данных",
+                    Message = GetDatabaseErrorMessage(dbEx),
+                    Details = _environment.IsDevelopment() ? dbEx.ToString() : null,
+                    Timestamp = DateTime.UtcNow,
+                    Status = 500
+                },
                 _ => new ErrorResponse
                 {
                     Error = "Внутренняя ошибка сервера",
-                    Message = exception.Message,
+                    Message = GetUserFriendlyMessage(exception),
+                    Details = _environment.IsDevelopment() ? exception.ToString() : null,
                     Timestamp = DateTime.UtcNow,
                     Status = 500
                 }
@@ -70,12 +82,39 @@ namespace StudioStatistic.Middleware
 
             return context.Response.WriteAsync(json);
         }
+
+        private static string GetDatabaseErrorMessage(DbUpdateException dbEx)
+        {
+            var innerException = dbEx.InnerException;
+
+            if (innerException?.Message != null)
+            {
+                if (innerException.Message.Contains("23505"))
+                    return "Нарушение уникальности: запись с такими данными уже существует";
+                if (innerException.Message.Contains("23503"))
+                    return "Нарушение внешнего ключа: связанная запись не найдена";
+                if (innerException.Message.Contains("23502"))
+                    return "Обязательное поле не заполнено";
+                if (innerException.Message.Contains("23514"))
+                    return "Нарушение проверочного ограничения";
+
+                return innerException.Message;
+            }
+
+            return "Произошла ошибка при сохранении данных в базу данных";
+        }
+
+        private static string GetUserFriendlyMessage(Exception exception)
+        {
+            return exception.InnerException?.Message ?? exception.Message;
+        }
     }
 
     public class ErrorResponse
     {
         public string Error { get; set; } = null!;
         public string? Message { get; set; }
+        public string? Details { get; set; }
         public DateTime? Timestamp { get; set; }
         public int Status { get; set; }
     }
