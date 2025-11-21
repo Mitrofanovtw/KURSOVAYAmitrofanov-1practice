@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudioStatistic.Models.DTO;
-using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
 using StudioStatistic.Services;
 
 namespace StudioStatistic.Controllers
@@ -51,7 +50,7 @@ namespace StudioStatistic.Controllers
         /// Обновить услугу
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateServiceDto dto) 
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try

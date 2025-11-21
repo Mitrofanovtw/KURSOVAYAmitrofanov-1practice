@@ -2,8 +2,6 @@
 using StudioStatistic.DTO;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
-using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
-
 namespace StudioStatistic
 {
     public class MappingProfile : Profile
@@ -12,10 +10,12 @@ namespace StudioStatistic
         {
             CreateMap<Client, ClientDto>();
             CreateMap<ClientDto, Client>();
+            CreateMap<UpdateClientDto, Client>();
             CreateMap<CreateClientDto, Client>();
 
             CreateMap<Engineers, EngineerDto>();
             CreateMap<CreateEngineerDto, Engineers>();
+            CreateMap<UpdateEngineerDto, Engineers>();
 
             CreateMap<Service, ServiceDto>();
             CreateMap<CreateServiceDto, Service>();

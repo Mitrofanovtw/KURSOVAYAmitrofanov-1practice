@@ -52,7 +52,7 @@ namespace StudioStatistic.Controllers
         /// Обновить клиента
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ClientDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateClientDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             try

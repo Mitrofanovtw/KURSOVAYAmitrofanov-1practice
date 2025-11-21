@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
-using StudioStatistic.Models.DTO.StudioStatistic.Models.DTO;
 using StudioStatistic.Repositories;
 
 namespace StudioStatistic.Services

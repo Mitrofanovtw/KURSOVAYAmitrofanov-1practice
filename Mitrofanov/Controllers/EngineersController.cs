@@ -43,6 +43,28 @@ namespace StudioStatistic.Controllers
         }
 
         /// <summary>
+        /// Обновить данные звукорежиссёра
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<EngineerDto>> Update(int id, [FromBody] UpdateEngineerDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var updated = await _service.UpdateAsync(id, dto);
+                return Ok(updated);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Уволить звукорежиссёра
         /// </summary>
         [HttpDelete("{id}")]

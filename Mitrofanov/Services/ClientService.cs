@@ -54,7 +54,7 @@ namespace StudioStatistic.Services
         /// <summary>
         /// Обновляет клиента
         /// </summary>
-        public async Task<ClientDto> UpdateAsync(int id, ClientDto dto)
+        public async Task<ClientDto> UpdateAsync(int id, UpdateClientDto dto)
         {
             var client = _repo.GetById(id);
             if (client == null) throw new KeyNotFoundException("Клиент не найден");

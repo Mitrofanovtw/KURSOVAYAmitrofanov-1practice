@@ -56,11 +56,19 @@ namespace StudioStatistic.Services
         /// <summary>
         /// Обновить данные звукорежиссёра
         /// </summary>
-        public async Task<EngineerDto> UpdateAsync(int id, EngineerDto dto)
+        public async Task<EngineerDto> UpdateAsync(int id, UpdateEngineerDto dto)
         {
             var engineer = _repo.GetById(id);
             if (engineer == null)
                 throw new KeyNotFoundException("Звукорежиссёр не найден");
+
+            var existing = _repo.GetAll().FirstOrDefault(e =>
+                e.Id != id &&
+                e.FirstName.ToLower() == dto.FirstName.ToLower() &&
+                e.LastName.ToLower() == dto.LastName.ToLower());
+
+            if (existing != null)
+                throw new InvalidOperationException("Звукорежиссёр с таким именем и фамилией уже существует");
 
             _mapper.Map(dto, engineer);
             var updated = _repo.Update(engineer);
