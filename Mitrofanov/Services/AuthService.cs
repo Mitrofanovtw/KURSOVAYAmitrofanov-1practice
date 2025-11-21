@@ -4,6 +4,7 @@ using StudioStatistic.Models.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudioStatistic.Services
 {
@@ -46,16 +47,24 @@ namespace StudioStatistic.Services
 
         public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto dto)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == dto.Email);
-            if (user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user != null)
             {
-                return GenerateAuthResponse(user.Username, user.Email, user.Role.ToString());
+                var isPasswordValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash));
+                if (isPasswordValid)
+                {
+                    return GenerateAuthResponse(user.Username, user.Email, user.Role.ToString());
+                }
             }
 
-            var admin = _context.Admins.FirstOrDefault(a => a.Email == dto.Email);
-            if (admin != null && BCrypt.Net.BCrypt.Verify(dto.Password, admin.PasswordHash))
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Email == dto.Email);
+            if (admin != null)
             {
-                return GenerateAuthResponse(admin.Name, admin.Email, "Admin");
+                var isPasswordValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(dto.Password, admin.PasswordHash));
+                if (isPasswordValid)
+                {
+                    return GenerateAuthResponse(admin.Name, admin.Email, "Admin");
+                }
             }
 
             return null;

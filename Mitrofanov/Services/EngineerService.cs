@@ -21,7 +21,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<IEnumerable<EngineerDto>> GetAllAsync()
         {
-            var engineers = _repo.GetAll();
+            var engineers = await Task.Run(() => _repo.GetAll());
             return _mapper.Map<IEnumerable<EngineerDto>>(engineers);
         }
 
@@ -30,10 +30,8 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<EngineerDto?> GetByIdAsync(int id)
         {
-            var engineer = _repo.GetById(id);
-            return engineer == null
-                ? null
-                : _mapper.Map<EngineerDto>(engineer);
+            var engineer = await Task.Run(() => _repo.GetById(id));
+            return engineer == null ? null : _mapper.Map<EngineerDto>(engineer);
         }
 
         /// <summary>
@@ -46,10 +44,10 @@ namespace StudioStatistic.Services
                 e.LastName.ToLower() == dto.LastName.ToLower());
 
             if (existing != null)
-                throw new InvalidOperationException("звукоинженер с таким именем и фамилией уже существует");
+                throw new InvalidOperationException("Звукоинженер с таким именем и фамилией уже существует");
 
             var engineer = _mapper.Map<Engineers>(dto);
-            var created = _repo.Create(engineer);
+            var created = await Task.Run(() => _repo.Create(engineer));
             return _mapper.Map<EngineerDto>(created);
         }
 
@@ -58,7 +56,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<EngineerDto> UpdateAsync(int id, UpdateEngineerDto dto)
         {
-            var engineer = _repo.GetById(id);
+            var engineer = await Task.Run(() => _repo.GetById(id));
             if (engineer == null)
                 throw new KeyNotFoundException("Звукорежиссёр не найден");
 
@@ -71,7 +69,7 @@ namespace StudioStatistic.Services
                 throw new InvalidOperationException("Звукорежиссёр с таким именем и фамилией уже существует");
 
             _mapper.Map(dto, engineer);
-            var updated = _repo.Update(engineer);
+            var updated = await Task.Run(() => _repo.Update(engineer));
             return _mapper.Map<EngineerDto>(updated);
         }
 
@@ -80,7 +78,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<bool> DeleteAsync(int id)
         {
-            return _repo.Delete(id);
+            return await Task.Run(() => _repo.Delete(id));
         }
     }
 }

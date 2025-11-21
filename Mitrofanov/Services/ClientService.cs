@@ -21,7 +21,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<IEnumerable<ClientDto>> GetAllAsync()
         {
-            var clients = _repo.GetAll();
+            var clients = await Task.Run(() => _repo.GetAll());
             return _mapper.Map<IEnumerable<ClientDto>>(clients);
         }
 
@@ -30,7 +30,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ClientDto?> GetByIdAsync(int id)
         {
-            var client = _repo.GetById(id);
+            var client = await Task.Run(() => _repo.GetById(id));
             return client == null ? null : _mapper.Map<ClientDto>(client);
         }
 
@@ -47,7 +47,7 @@ namespace StudioStatistic.Services
                 throw new InvalidOperationException("Клиент с таким именем и фамилией уже существует");
 
             var client = _mapper.Map<Client>(dto);
-            var created = _repo.Create(client);
+            var created = await Task.Run(() => _repo.Create(client));
             return _mapper.Map<ClientDto>(created);
         }
 
@@ -56,11 +56,11 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ClientDto> UpdateAsync(int id, UpdateClientDto dto)
         {
-            var client = _repo.GetById(id);
+            var client = await Task.Run(() => _repo.GetById(id));
             if (client == null) throw new KeyNotFoundException("Клиент не найден");
 
             _mapper.Map(dto, client);
-            var updated = _repo.Update(client);
+            var updated = await Task.Run(() => _repo.Update(client));
             return _mapper.Map<ClientDto>(updated);
         }
 
@@ -69,7 +69,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<bool> DeleteAsync(int id)
         {
-            return _repo.Delete(id);
+            return await Task.Run(() => _repo.Delete(id));
         }
     }
 }

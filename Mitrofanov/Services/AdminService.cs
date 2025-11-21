@@ -24,7 +24,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<IEnumerable<AdminDto>> GetAllAsync()
         {
-            var admins = _repo.GetAll();
+            var admins = await Task.Run(() => _repo.GetAll());
             return _mapper.Map<IEnumerable<AdminDto>>(admins);
         }
 
@@ -33,7 +33,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<AdminDto?> GetByIdAsync(int id)
         {
-            var admin = _repo.GetById(id);
+            var admin = await Task.Run(() => _repo.GetById(id));
             return admin == null ? null : _mapper.Map<AdminDto>(admin);
         }
 
@@ -49,7 +49,7 @@ namespace StudioStatistic.Services
             var admin = _mapper.Map<Admin>(dto);
             admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            var created = _repo.Create(admin);
+            var created = await Task.Run(() => _repo.Create(admin));
             return _mapper.Map<AdminDto>(created);
         }
 
@@ -58,7 +58,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<UserDto> ChangeUserRoleAsync(int userId, UserRole newRole)
         {
-            var user = _userRepo.GetById(userId);
+            var user = await Task.Run(() => _userRepo.GetById(userId));
             if (user == null)
                 throw new KeyNotFoundException("Пользователь не найден");
 

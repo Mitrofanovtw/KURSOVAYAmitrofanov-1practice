@@ -21,7 +21,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<IEnumerable<ServiceDto>> GetAllAsync()
         {
-            var services = _repo.GetAll();
+            var services = await Task.Run(() => _repo.GetAll());
             return _mapper.Map<IEnumerable<ServiceDto>>(services);
         }
 
@@ -30,7 +30,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ServiceDto?> GetByIdAsync(int id)
         {
-            var service = _repo.GetById(id);
+            var service = await Task.Run(() => _repo.GetById(id));
             return service == null ? null : _mapper.Map<ServiceDto>(service);
         }
 
@@ -39,14 +39,12 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
         {
-            var existingService = _repo.GetAll().FirstOrDefault(s => s.Name == dto.Name);
-            if (existingService != null)
-            {
+            var existing = _repo.GetAll().FirstOrDefault(s => s.Name.ToLower() == dto.Name.ToLower());
+            if (existing != null)
                 throw new InvalidOperationException("Услуга с таким названием уже существует");
-            }
 
             var service = _mapper.Map<Service>(dto);
-            var created = _repo.Create(service);
+            var created = await Task.Run(() => _repo.Create(service));
             return _mapper.Map<ServiceDto>(created);
         }
 
@@ -55,12 +53,11 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ServiceDto> UpdateAsync(int id, UpdateServiceDto dto)
         {
-            var service = _repo.GetById(id);
+            var service = await Task.Run(() => _repo.GetById(id));
             if (service == null) throw new KeyNotFoundException("Услуга не найдена");
 
-            // Автоматический маппинг
             _mapper.Map(dto, service);
-            var updated = _repo.Update(service);
+            var updated = await Task.Run(() => _repo.Update(service));
             return _mapper.Map<ServiceDto>(updated);
         }
 
@@ -69,7 +66,7 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<bool> DeleteAsync(int id)
         {
-            return _repo.Delete(id);
+            return await Task.Run(() => _repo.Delete(id));
         }
     }
 }

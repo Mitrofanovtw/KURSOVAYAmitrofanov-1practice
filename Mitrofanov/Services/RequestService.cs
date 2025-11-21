@@ -30,13 +30,13 @@ namespace StudioStatistic.Services
 
         public async Task<IEnumerable<RequestDto>> GetAllAsync()
         {
-            var requests = _requestRepo.GetAll();
+            var requests = await Task.Run(() => _requestRepo.GetAll());
             return _mapper.Map<IEnumerable<RequestDto>>(requests);
         }
 
         public async Task<RequestDto?> GetByIdAsync(int id)
         {
-            var request = _requestRepo.GetById(id);
+            var request = await Task.Run(() => _requestRepo.GetById(id));
             return request == null ? null : _mapper.Map<RequestDto>(request);
         }
 
@@ -44,16 +44,24 @@ namespace StudioStatistic.Services
         {
             var request = _mapper.Map<Request>(dto);
 
-            var client = _clientRepo.GetById(dto.ClientId) ?? throw new KeyNotFoundException("Клиент не найден");
-            var engineer = _engineerRepo.GetById(dto.EngineerId) ?? throw new KeyNotFoundException("Инженер не найден");
-            var service = _serviceRepo.GetById(dto.ServiceId) ?? throw new KeyNotFoundException("Услуга не найдена");
+            var client = await Task.Run(() => _clientRepo.GetById(dto.ClientId));
+            if (client == null)
+                throw new KeyNotFoundException("Клиент не найден");
+
+            var engineer = await Task.Run(() => _engineerRepo.GetById(dto.EngineerId));
+            if (engineer == null)
+                throw new KeyNotFoundException("Инженер не найден");
+
+            var service = await Task.Run(() => _serviceRepo.GetById(dto.ServiceId));
+            if (service == null)
+                throw new KeyNotFoundException("Услуга не найдена");
 
             request.Client = client;
             request.Engineer = engineer;
             request.Service = service;
             request.Cost = service.Price;
 
-            var created = _requestRepo.Create(request);
+            var created = await Task.Run(() => _requestRepo.Create(request));
             return _mapper.Map<RequestDto>(created);
         }
     }
