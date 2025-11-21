@@ -1,4 +1,5 @@
-﻿using StudioStatistic.Models.DTO;
+﻿using StudioStatistic.Models;
+using StudioStatistic.Models.DTO;
 
 namespace StudioStatistic.Services
 {
@@ -7,5 +8,6 @@ namespace StudioStatistic.Services
         Task<IEnumerable<AdminDto>> GetAllAsync();
         Task<AdminDto?> GetByIdAsync(int id);
         Task<AdminDto> CreateAsync(CreateAdminDto dto);
+        Task<UserDto> ChangeUserRoleAsync(int userId, UserRole newRole);
     }
 }

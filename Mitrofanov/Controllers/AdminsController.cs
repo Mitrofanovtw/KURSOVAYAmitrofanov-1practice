@@ -45,5 +45,22 @@ namespace StudioStatistic.Controllers
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
+
+        /// <summary>
+        /// Изменить роль пользователя (только для админов)
+        /// </summary>
+        [HttpPut("users/{userId}/role")]
+        public async Task<ActionResult<UserDto>> ChangeUserRole(int userId, [FromBody] ChangeRoleDto dto)
+        {
+            try
+            {
+                var updatedUser = await _service.ChangeUserRoleAsync(userId, dto.NewRole);
+                return Ok(updatedUser);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
     }
 }

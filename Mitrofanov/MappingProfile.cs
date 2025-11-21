@@ -23,7 +23,8 @@ namespace StudioStatistic
             CreateMap<UpdateServiceDto, Service>();
 
             CreateMap<Admin, AdminDto>();
-            CreateMap<CreateAdminDto, Admin>();
+            CreateMap<CreateAdminDto, Admin>()
+    .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
             CreateMap<Request, RequestDto>()
         .ForMember(d => d.ClientName, o => o.MapFrom(s => $"{s.Client.FirstName} {s.Client.LastName}"))

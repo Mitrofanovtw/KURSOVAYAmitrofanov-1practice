@@ -21,6 +21,6 @@ namespace StudioStatistic.Models.DTO
         public string Token { get; set; } = null!;
         public DateTime Expires { get; set; }
         public string Username { get; set; } = null!;
-        public UserRole Role { get; set; }
+        public string Role { get; set; } = null!;
     }
 }

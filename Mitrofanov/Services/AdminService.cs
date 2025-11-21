@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
 using StudioStatistic.Repositories;
@@ -9,10 +10,12 @@ namespace StudioStatistic.Services
     {
         private readonly IAdminRepository _repo;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepo;
 
-        public AdminService(IAdminRepository repo, IMapper mapper)
+        public AdminService(IAdminRepository repo, IUserRepository userRepo, IMapper mapper)
         {
             _repo = repo;
+            _userRepo = userRepo;
             _mapper = mapper;
         }
 
@@ -39,9 +42,37 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<AdminDto> CreateAsync(CreateAdminDto dto)
         {
+            var existingAdmin = _repo.GetAll().FirstOrDefault(a => a.Email == dto.Email);
+            if (existingAdmin != null)
+                throw new InvalidOperationException("Администратор с таким email уже существует");
+
             var admin = _mapper.Map<Admin>(dto);
+            admin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
             var created = _repo.Create(admin);
             return _mapper.Map<AdminDto>(created);
+        }
+
+        /// <summary>
+        /// Обновление роли
+        /// </summary>
+        public async Task<UserDto> ChangeUserRoleAsync(int userId, UserRole newRole)
+        {
+            var user = _userRepo.GetById(userId);
+            if (user == null)
+                throw new KeyNotFoundException("Пользователь не найден");
+
+            user.Role = newRole;
+            _userRepo.Update(user);
+            await _userRepo.SaveChangesAsync();
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            };
         }
     }
 }

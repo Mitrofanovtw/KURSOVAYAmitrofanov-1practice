@@ -23,55 +23,63 @@ namespace StudioStatistic.Services
             if (_context.Users.Any(u => u.Email == dto.Email))
                 throw new InvalidOperationException("User already exists");
 
-            UserRole userRole;
-            if (!Enum.TryParse<UserRole>(dto.Role, true, out userRole))
-                throw new InvalidOperationException("Недопустимая роль");
-
             var user = new User
             {
                 Username = dto.Username,
                 Email = dto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Role = userRole
+                Role = UserRole.Client
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            var token = GenerateJwtToken(user);
+            var token = GenerateJwtToken(user.Username, user.Email, user.Role.ToString());
             return new AuthResponseDto
             {
                 Token = token,
                 Expires = DateTime.UtcNow.AddMinutes(60),
                 Username = user.Username,
-                Role = user.Role
+                Role = user.Role.ToString()
             };
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto dto)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == dto.Email);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-                return null;
+            if (user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return GenerateAuthResponse(user.Username, user.Email, user.Role.ToString());
+            }
 
-            var token = GenerateJwtToken(user);
+            var admin = _context.Admins.FirstOrDefault(a => a.Email == dto.Email);
+            if (admin != null && BCrypt.Net.BCrypt.Verify(dto.Password, admin.PasswordHash))
+            {
+                return GenerateAuthResponse(admin.Name, admin.Email, "Admin");
+            }
+
+            return null;
+        }
+
+        private AuthResponseDto GenerateAuthResponse(string username, string email, string role)
+        {
+            var token = GenerateJwtToken(username, email, role);
             return new AuthResponseDto
             {
                 Token = token,
                 Expires = DateTime.UtcNow.AddMinutes(60),
-                Username = user.Username,
-                Role = user.Role
+                Username = username,
+                Role = role
             };
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(string username, string email, string role)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
