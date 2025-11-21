@@ -40,6 +40,12 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ServiceDto> CreateAsync(CreateServiceDto dto)
         {
+            var existingService = _repo.GetAll().FirstOrDefault(s => s.Name == dto.Name);
+            if (existingService != null)
+            {
+                throw new InvalidOperationException("Услуга с таким названием уже существует");
+            }
+
             var service = _mapper.Map<Service>(dto);
             var created = _repo.Create(service);
             return _mapper.Map<ServiceDto>(created);

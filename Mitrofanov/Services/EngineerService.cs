@@ -41,6 +41,13 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<EngineerDto> CreateAsync(CreateEngineerDto dto)
         {
+            var existing = _repo.GetAll().FirstOrDefault(e =>
+                e.FirstName.ToLower() == dto.FirstName.ToLower() &&
+                e.LastName.ToLower() == dto.LastName.ToLower());
+
+            if (existing != null)
+                throw new InvalidOperationException("звукоинженер с таким именем и фамилией уже существует");
+
             var engineer = _mapper.Map<Engineers>(dto);
             var created = _repo.Create(engineer);
             return _mapper.Map<EngineerDto>(created);

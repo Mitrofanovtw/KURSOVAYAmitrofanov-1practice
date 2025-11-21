@@ -7,8 +7,11 @@ namespace StudioStatistic.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(35)]
-        public string Name { get; set; } = null!;
+        [Required, MaxLength(25)]
+        public string FirstName { get; set; } = null!;
+
+        [Required, MaxLength(25)]
+        public string LastName { get; set; } = null!;
 
         [Required, MaxLength(150)]
         public string Adress { get; set; } = null!;
@@ -16,7 +19,7 @@ namespace StudioStatistic.Models
         [Required, MaxLength(35)]
         public string WorkExp { get; set; } = null!;
 
-        [MaxLength(300)]
+        [MaxLength(200)]
         public string AboutHimself { get; set; } = string.Empty;
 
         public List<Request> Requests { get; set; } = new();

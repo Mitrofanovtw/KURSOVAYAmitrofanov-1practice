@@ -7,8 +7,11 @@ namespace StudioStatistic.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(50)]
-        public string Name { get; set; } = null!;
+        [Required, MaxLength(25)]
+        public string FirstName { get; set; } = null!;
+
+        [Required, MaxLength(25)]
+        public string LastName { get; set; } = null!;
 
         public int QuantityOfVisits { get; set; } = 0;
 

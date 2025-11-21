@@ -39,6 +39,13 @@ namespace StudioStatistic.Services
         /// </summary>
         public async Task<ClientDto> CreateAsync(CreateClientDto dto)
         {
+            var existing = _repo.GetAll().FirstOrDefault(c =>
+                c.FirstName.ToLower() == dto.FirstName.ToLower() &&
+                c.LastName.ToLower() == dto.LastName.ToLower());
+
+            if (existing != null)
+                throw new InvalidOperationException("Клиент с таким именем и фамилией уже существует");
+
             var client = _mapper.Map<Client>(dto);
             var created = _repo.Create(client);
             return _mapper.Map<ClientDto>(created);
