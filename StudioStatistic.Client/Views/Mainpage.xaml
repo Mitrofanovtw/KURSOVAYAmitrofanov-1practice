@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudioStatistic.Client.Views.MainPage"
+             Title="Главная">
+
+    <VerticalStackLayout Padding="30" Spacing="20">
+        <Label Text="ДОБРО ПОЖАЛОВАТЬ В STUDIOSTATISTIC!"
+               FontSize="28"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Label Text="Ты успешно вошёл в систему"
+               FontSize="18"
+               HorizontalOptions="Center" />
+
+        <Button Text="Выйти"
+                Command="{Binding LogoutCommand}"
+                BackgroundColor="IndianRed"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="50" />
+    </VerticalStackLayout>
+</ContentPage>

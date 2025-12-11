@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:StudioStatistic.Client.ViewModels"
+             x:Class="StudioStatistic.Client.Views.LoginPage"
+             Title="Вход в систему">
+
+    <StackLayout Padding="40" Spacing="20" VerticalOptions="Center">
+
+        <Label Text="StudioStatistic" 
+               FontSize="32" 
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Entry Placeholder="Email" 
+               Text="{Binding Email}"
+               Keyboard="Email" />
+
+        <Entry Placeholder="Пароль" 
+               Text="{Binding Password}"
+               IsPassword="True" />
+
+        <Button Text="ВОЙТИ"
+                Command="{Binding LoginCommand}"
+                BackgroundColor="#512BD4"
+                TextColor="White"
+                CornerRadius="10"
+                FontSize="18"
+                HeightRequest="55" />
+
+        <Label Text="{Binding ErrorMessage}"
+               TextColor="Red"
+               HorizontalOptions="Center" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           Color="#512BD4" />
+
+    </StackLayout>
+</ContentPage>
