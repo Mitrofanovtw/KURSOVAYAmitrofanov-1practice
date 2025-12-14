@@ -1,0 +1,36 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Forms
+@using StudioStatistic.Web.Models.DTO
+@using StudioStatistic.Web.Services
+@inject IApiService Api
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<h3>Вход в систему</h3>
+
+<EditForm Model="@model" OnValidSubmit="@HandleLogin">
+    <InputText @bind-Value="model.Email" placeholder="Email" />
+    <InputText @bind-Value="model.Password" type="password" placeholder="Пароль" />
+    <button type="submit">Войти</button>
+</EditForm>
+
+<p>@ErrorMessage</p>
+
+@code {
+    private LoginRequestDto model = new();
+    private string ErrorMessage = "";
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Api.LoginAsync(model);
+            await Auth.SaveTokenAsync(response);
+            Nav.NavigateTo("/");
+        }
+        catch
+        {
+            ErrorMessage = "Ошибка входа";
+        }
+    }
+}

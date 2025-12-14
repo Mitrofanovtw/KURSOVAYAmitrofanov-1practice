@@ -1,0 +1,49 @@
+﻿@page "/"
+@using StudioStatistic.Web.Services
+@using StudioStatistic.Web.Models.DTO
+@inject IApiService Api
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+@if (string.IsNullOrEmpty(Auth.Token))
+{
+    <p>Не авторизован. <a href="/login">Войти</a></p>
+}
+else
+{
+    <h1>Клиенты</h1>
+    @if (clients == null)
+    {
+        <p>Загрузка...</p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var c in clients)
+            {
+                <li>@c.FirstName @c.LastName — посещений: @c.QuantityOfVisits</li>
+            }
+        </ul>
+    }
+
+    <button @onclick="Logout">Выйти</button>
+}
+
+@code {
+    private List<ClientDto>? clients;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Auth.LoadTokenAsync();
+        if (!string.IsNullOrEmpty(Auth.Token))
+        {
+            clients = await Api.GetClientsAsync(Auth.GetBearerToken()!);
+        }
+    }
+
+    private async Task Logout()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/login");
+    }
+}
