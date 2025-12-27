@@ -1,10 +1,13 @@
-﻿namespace StudioStatistic.Client.Views // ← ВОТ ЭТОТ!
+﻿using StudioStatistic.Client.ViewModels;
+
+namespace StudioStatistic.Client
 {
     public partial class MainPage : ContentPage
     {
-        public MainPage()
+        public MainPage(MainPageViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel;
         }
     }
 }

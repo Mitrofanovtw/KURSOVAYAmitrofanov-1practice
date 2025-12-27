@@ -22,5 +22,6 @@ namespace StudioStatistic.Models.DTO
         public DateTime Expires { get; set; }
         public string Username { get; set; } = null!;
         public string Role { get; set; } = null!;
+        public string FullName { get; set; } = string.Empty;
     }
 }

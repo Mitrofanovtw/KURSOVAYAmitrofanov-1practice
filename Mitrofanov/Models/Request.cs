@@ -2,6 +2,14 @@
 
 namespace StudioStatistic.Models
 {
+    public enum RequestStatus
+    {
+        New,
+        Accepted,
+        Completed,
+        Cancelled
+    }
+
     public class Request
     {
         [Key]
@@ -24,5 +32,6 @@ namespace StudioStatistic.Models
 
         [Required]
         public DateTime DateOfVisit { get; set; }
+        public RequestStatus Status { get; set; } = RequestStatus.New;
     }
 }

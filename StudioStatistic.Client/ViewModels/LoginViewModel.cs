@@ -7,6 +7,8 @@ namespace StudioStatistic.Client.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
+        private readonly ApiService _apiService;
+
         [ObservableProperty]
         private string email = string.Empty;
 
@@ -14,38 +16,60 @@ namespace StudioStatistic.Client.ViewModels
         private string password = string.Empty;
 
         [ObservableProperty]
+        private bool isBusy;
+
+        [ObservableProperty]
         private string errorMessage = string.Empty;
 
-        private readonly IApiService _api;
-        private readonly AuthService _auth;
+        [ObservableProperty]
+        private bool hasError;
 
-        public LoginViewModel(IApiService api, AuthService auth)
+        public LoginViewModel(ApiService apiService)
         {
-            _api = api;
-            _auth = auth;
+            _apiService = apiService;
         }
 
         [RelayCommand]
         private async Task Login()
         {
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+            {
+                ErrorMessage = "Заполните все поля";
+                HasError = true;
+                return;
+            }
+
+            IsBusy = true;
+            HasError = false;
+
             try
             {
-                ErrorMessage = string.Empty;
-
-                var response = await _api.LoginAsync(new LoginRequestDto
+                var request = new LoginRequestDto
                 {
                     Email = Email,
                     Password = Password
-                });
+                };
 
-                // ← ВОТ ЭТО ИСПРАВЛЕНИЕ!
-                _auth.SaveToken(response);
+                var response = await _apiService.LoginAsync(request);
 
-                await Shell.Current.GoToAsync("//main");
+                if (response.Token != string.Empty)
+                {
+                    await Shell.Current.GoToAsync("///main");
+                }
+                else
+                {
+                    ErrorMessage = "Ошибка входа";
+                    HasError = true;
+                }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Ошибка входа: " + ex.Message;
+                ErrorMessage = "Нет соединения";
+                HasError = true;
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }

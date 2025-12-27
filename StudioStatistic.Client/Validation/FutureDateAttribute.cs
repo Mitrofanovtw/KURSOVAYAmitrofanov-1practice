@@ -1,21 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudioStatistic.Client.Validation
+public class FutureDateAttribute : ValidationAttribute
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-    public class FutureDateAttribute : ValidationAttribute
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        public override bool IsValid(object? value)
+        if (value is DateTime dateTime)
         {
-            if (value is not DateTime dateTime)
-                return false;
-
-            return dateTime > DateTime.Now;
+            if (dateTime <= DateTime.UtcNow)
+                return new ValidationResult("Дата должна быть в будущем");
         }
-
-        public override string FormatErrorMessage(string name)
-        {
-            return ErrorMessage ?? "Дата визита должна быть в будущем";
-        }
+        return ValidationResult.Success!;
     }
 }

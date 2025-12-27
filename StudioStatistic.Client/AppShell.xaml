@@ -3,17 +3,86 @@
     x:Class="StudioStatistic.Client.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:StudioStatistic.Client"
     xmlns:views="clr-namespace:StudioStatistic.Client.Views"
-    Title="StudioStatistic">
+    xmlns:vm="clr-namespace:StudioStatistic.Client.ViewModels"
+    Title="StudioStatistic"
+    FlyoutBehavior="Flyout">
 
-    <ShellContent
-        Title="Вход"
-        ContentTemplate="{DataTemplate views:LoginPage}"
-        Route="login" />
+    <Shell.FlyoutHeader>
+        <Grid HeightRequest="150" BackgroundColor="{StaticResource Primary}">
+            <VerticalStackLayout Padding="20" VerticalOptions="Center">
+                <Label Text="Studio Statistic" 
+                       FontSize="24" 
+                       FontAttributes="Bold" 
+                       TextColor="White" />
+                <Label x:Name="UserNameLabel"
+                       FontSize="16" 
+                       TextColor="White" 
+                       Text="Гость" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
 
-    <ShellContent
-        Title="Главная"
-        ContentTemplate="{DataTemplate views:MainPage}"
-        Route="main" />
+    <Shell.FlyoutFooter>
+        <Grid Padding="10">
+            <VerticalStackLayout Spacing="10">
+
+                <Button x:Name="LogoutButton"
+                        Text="Выйти из аккаунта" 
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"
+                        BorderColor="{StaticResource Primary}"
+                        BorderWidth="1"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        Clicked="OnLogoutClicked"
+                        IsVisible="False" />
+                <Button x:Name="ExitAppButton"
+                        Text="Выйти из приложения" 
+                        BackgroundColor="Transparent"
+                        TextColor="Red"
+                        BorderColor="Red"
+                        BorderWidth="1"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        Clicked="OnExitAppClicked" />
+
+                <Label Text="Studio App v1.0"
+                       FontSize="12"
+                       TextColor="Gray"
+                       HorizontalOptions="Center"
+                       Margin="0,5,0,0" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutFooter>
+
+    <FlyoutItem Title="Мои заявки">
+        <ShellContent Route="myrequests" ContentTemplate="{DataTemplate views:MyRequestsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Новая заявка" x:Name="CreateRequestItem" IsVisible="False">
+        <ShellContent Route="createrequest" ContentTemplate="{DataTemplate views:CreateRequestPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Все заявки" x:Name="AllRequestsItem" IsVisible="False">
+        <ShellContent Route="allrequests" ContentTemplate="{DataTemplate views:AllRequestsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Клиенты" x:Name="ClientsItem" IsVisible="False">
+        <ShellContent Route="clients" ContentTemplate="{DataTemplate views:ClientsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Инженеры" x:Name="EngineersItem" IsVisible="False">
+        <ShellContent Route="engineers" ContentTemplate="{DataTemplate views:EngineersPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Услуги" x:Name="ServicesItem" IsVisible="False">
+        <ShellContent Route="services" ContentTemplate="{DataTemplate views:ServicesPage}" />
+    </FlyoutItem>
+
+    <ShellContent Route="login" 
+                  ContentTemplate="{DataTemplate views:LoginPage}" 
+                  FlyoutItemIsVisible="False" />
 
 </Shell>

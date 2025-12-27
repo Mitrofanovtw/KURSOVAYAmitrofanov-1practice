@@ -104,8 +104,7 @@ namespace StudioStatistic.Migrations
 
                     b.Property<string>("WorkExp")
                         .IsRequired()
-                        .HasMaxLength(35)
-                        .HasColumnType("character varying(35)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -138,6 +137,9 @@ namespace StudioStatistic.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("ServiceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

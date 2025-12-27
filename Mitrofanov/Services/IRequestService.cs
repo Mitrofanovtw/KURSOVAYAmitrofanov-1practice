@@ -7,5 +7,6 @@ namespace StudioStatistic.Services
         Task<IEnumerable<RequestDto>> GetAllAsync();
         Task<RequestDto?> GetByIdAsync(int id);
         Task<RequestDto> CreateAsync(CreateRequestDto dto);
+        Task<List<RequestDto>> GetByClientIdAsync(int clientId);
     }
 }

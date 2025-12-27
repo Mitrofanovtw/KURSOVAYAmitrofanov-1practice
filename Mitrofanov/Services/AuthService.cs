@@ -1,10 +1,10 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 
 namespace StudioStatistic.Services
 {
@@ -21,8 +21,8 @@ namespace StudioStatistic.Services
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto)
         {
-            if (_context.Users.Any(u => u.Email == dto.Email))
-                throw new InvalidOperationException("User already exists");
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+                throw new InvalidOperationException("Пользователь с таким email уже существует");
 
             var user = new User
             {
@@ -35,51 +35,79 @@ namespace StudioStatistic.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            _context.Clients.Add(new Client
+            {
+                Id = user.Id,
+                FirstName = dto.FirstName ?? "Новый",
+                LastName = dto.LastName ?? "Клиент",
+                QuantityOfVisits = 0
+            });
+            await _context.SaveChangesAsync();
+
             var token = GenerateJwtToken(user.Username, user.Email, user.Role.ToString());
+            var fullName = $"{dto.FirstName ?? "Новый"} {dto.LastName ?? "Клиент"}".Trim();
+
             return new AuthResponseDto
             {
                 Token = token,
                 Expires = DateTime.UtcNow.AddMinutes(60),
                 Username = user.Username,
-                Role = user.Role.ToString()
+                Role = user.Role.ToString(),
+                FullName = fullName
             };
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto dto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user != null)
-            {
-                var isPasswordValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash));
-                if (isPasswordValid)
-                {
-                    return GenerateAuthResponse(user.Username, user.Email, user.Role.ToString());
-                }
-            }
 
-            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Email == dto.Email);
-            if (admin != null)
-            {
-                var isPasswordValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(dto.Password, admin.PasswordHash));
-                if (isPasswordValid)
-                {
-                    return GenerateAuthResponse(admin.Name, admin.Email, "Admin");
-                }
-            }
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+                return null;
 
-            return null;
-        }
+            var token = GenerateJwtToken(user.Username, user.Email, user.Role.ToString());
+            var fullName = await GetFullNameAsync(user);
 
-        private AuthResponseDto GenerateAuthResponse(string username, string email, string role)
-        {
-            var token = GenerateJwtToken(username, email, role);
             return new AuthResponseDto
             {
                 Token = token,
                 Expires = DateTime.UtcNow.AddMinutes(60),
-                Username = username,
-                Role = role
+                Username = user.Username,
+                Role = user.Role.ToString(),
+                FullName = fullName
             };
+        }
+
+        private async Task<string> GetFullNameAsync(User user)
+        {
+            return user.Role switch
+            {
+                UserRole.Admin => await GetAdminName(user.Id),
+                UserRole.Engineer => await GetEngineerName(user.Id),
+                UserRole.Client => await GetClientName(user.Id),
+                _ => user.Username
+            };
+        }
+
+        private async Task<string> GetAdminName(int userId)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Id == userId);
+            return admin?.Name ?? "Админ";
+        }
+
+        private async Task<string> GetEngineerName(int userId)
+        {
+            var engineer = await _context.Engineers.FirstOrDefaultAsync(e => e.Id == userId);
+            return engineer != null
+                ? $"{engineer.FirstName} {engineer.LastName}".Trim()
+                : "Инженер";
+        }
+
+        private async Task<string> GetClientName(int userId)
+        {
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Id == userId);
+            return client != null
+                ? $"{client.FirstName} {client.LastName}".Trim()
+                : "Клиент";
         }
 
         private string GenerateJwtToken(string username, string email, string role)

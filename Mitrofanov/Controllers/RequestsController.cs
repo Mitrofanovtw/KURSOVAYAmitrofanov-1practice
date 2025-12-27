@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
+using StudioStatistic.Repositories;
 using StudioStatistic.Services;
+using System.Security.Claims;
 
 namespace StudioStatistic.Controllers
 {
@@ -11,8 +15,17 @@ namespace StudioStatistic.Controllers
     public class RequestsController : ControllerBase
     {
         private readonly IRequestService _service;
+        private readonly APIDBContext _context;
+        private readonly IUserRepository _userRepository;
+        private readonly IRequestService _requestService;
 
-        public RequestsController(IRequestService service) => _service = service;
+        public RequestsController(IRequestService service, IUserRepository userRepository, APIDBContext context, IRequestService requestService)
+        {
+            _service = service;
+            _userRepository = userRepository;
+            _context = context;
+            _requestService = requestService;
+        }
 
         /// <summary>
         /// Получить все заявки
@@ -43,6 +56,44 @@ namespace StudioStatistic.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, (object?)created);
+        }
+
+        [HttpGet("my")]
+        [Authorize]
+        public async Task<ActionResult<List<RequestDto>>> GetMyRequests()
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized();
+
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null || user.Role != UserRole.Client)
+                return Forbid();
+
+            var requests = await _service.GetByClientIdAsync(user.Id);
+            return Ok(requests);
+        }
+
+        [HttpPut("{id}/status")]
+        [Authorize(Roles = "Engineer,Admin")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
+        {
+            var request = await _context.Requests.FindAsync(id);
+            if (request == null)
+                return NotFound();
+
+            if (!Enum.TryParse<RequestStatus>(dto.Status, true, out var status))
+                return BadRequest("Неверный статус");
+
+            request.Status = status;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        public class UpdateStatusDto
+        {
+            public string Status { get; set; } = "New";
         }
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:StudioStatistic.Client.ViewModels"
+             x:Class="StudioStatistic.Client.Views.EngineersPage"
+             Title="Инженеры">
+
+    <CollectionView ItemsSource="{Binding Engineers}">
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Frame BackgroundColor="#1E1E1E" CornerRadius="12" Margin="10">
+                    <StackLayout Padding="15">
+                        <Label Text="{Binding FirstName} {Binding LastName}" FontSize="18" TextColor="#D32F2F" />
+                        <Label Text="{Binding WorkExp}" TextColor="White" />
+                        <Label Text="{Binding AboutHimself}" TextColor="Gray" />
+                    </StackLayout>
+                </Frame>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+
+</ContentPage>

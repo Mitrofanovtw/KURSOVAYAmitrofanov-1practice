@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Refit;
-using StudioStatistic.Client.Views;
-using StudioStatistic.Client.ViewModels; // ← ДОБАВИЛ ЭТО!
 using StudioStatistic.Client.Services;
+using StudioStatistic.Client.ViewModels;
+using StudioStatistic.Client.Views;
 
 namespace StudioStatistic.Client
 {
@@ -19,26 +18,39 @@ namespace StudioStatistic.Client
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<IApiService>(sp =>
-            {
-                var handler = new HttpClientHandler();
-                if (DeviceInfo.Platform == DevicePlatform.Android)
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-
-                var client = new HttpClient(handler)
-                {
-                    BaseAddress = new Uri("https://localhost:7146")
-                };
-                return RestService.For<IApiService>(client);
-            });
-
-            builder.Services.AddSingleton<AuthService>();
-            builder.Services.AddTransient<LoginPage>();
-            builder.Services.AddTransient<LoginViewModel>();
-
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddHttpClient("Api", client =>
+            {
+                client.BaseAddress = new Uri("http://10.0.2.2:5085/");
+            });
+            builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddTransient<ApiService>();
+
+            builder.Services.AddSingleton<AppShell>();
+
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<LoginViewModel>();
+
+            builder.Services.AddTransient<MyRequestsPage>();
+            builder.Services.AddTransient<MyRequestsViewModel>();
+
+            builder.Services.AddTransient<CreateRequestPage>();
+            builder.Services.AddTransient<CreateRequestViewModel>();
+
+            builder.Services.AddTransient<AllRequestsPage>();
+            builder.Services.AddTransient<AllRequestsViewModel>();
+
+            builder.Services.AddTransient<ClientsPage>();
+            builder.Services.AddTransient<ClientsViewModel>();
+
+            builder.Services.AddTransient<EngineersPage>();
+            builder.Services.AddTransient<EngineersViewModel>();
+
+            builder.Services.AddTransient<ServicesPage>();
+            builder.Services.AddTransient<ServicesViewModel>();
 
             return builder.Build();
         }

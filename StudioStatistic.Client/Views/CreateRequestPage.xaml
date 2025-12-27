@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StudioStatistic.Client.Views.CreateRequestPage"
+             Title="Новая заявка">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20">
+
+            <Picker Title="Услуга"
+                    ItemsSource="{Binding Services}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedService}" />
+
+            <DatePicker Date="{Binding SelectedDate}"
+                        MinimumDate="{Binding Today}" />
+
+            <TimePicker Time="{Binding SelectedTime}" />
+
+            <Editor Placeholder="Описание"
+                    Text="{Binding Description}"
+                    HeightRequest="100" />
+
+            <Button Text="Создать заявку"
+                    Command="{Binding CreateRequestCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -8,14 +8,24 @@ namespace StudioStatistic.Services
 {
     public class AdminService : IAdminService
     {
+        private readonly IClientRepository _clientRepo;
         private readonly IAdminRepository _repo;
-        private readonly IMapper _mapper;
+        private readonly IEngineersRepository _engineerRepo;
         private readonly IUserRepository _userRepo;
+        private readonly IMapper _mapper;
 
-        public AdminService(IAdminRepository repo, IUserRepository userRepo, IMapper mapper)
+        public AdminService(
+            IAdminRepository repo,
+            IUserRepository userRepo,
+            IClientRepository clientRepo,
+            IAdminRepository adminRepo,
+            IEngineersRepository engineerRepo,
+            IMapper mapper)
         {
             _repo = repo;
             _userRepo = userRepo;
+            _clientRepo = clientRepo;
+            _engineerRepo = engineerRepo;
             _mapper = mapper;
         }
 
@@ -56,23 +66,99 @@ namespace StudioStatistic.Services
         /// <summary>
         /// Обновление роли
         /// </summary>
-        public async Task<UserDto> ChangeUserRoleAsync(int userId, UserRole newRole)
+        public async Task UpdateRoleAsync(int userId, UserRole newRole)
         {
-            var user = await Task.Run(() => _userRepo.GetById(userId));
+            var user = await _userRepo.GetByIdAsync(userId);
             if (user == null)
                 throw new KeyNotFoundException("Пользователь не найден");
 
-            user.Role = newRole;
-            _userRepo.Update(user);
-            await _userRepo.SaveChangesAsync();
+            var oldRole = user.Role;
 
-            return new UserDto
+            if (oldRole == UserRole.Client && newRole != UserRole.Client)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                Role = user.Role.ToString()
-            };
+                var client = await _clientRepo.GetByIdAsync(userId);
+                if (client != null)
+                {
+                    if (newRole == UserRole.Admin)
+                    {
+                        var admin = new Admin
+                        {
+                            Id = userId,
+                            Name = client.FirstName,
+                            Email = "",
+                        };
+                        await _repo.CreateAsync(admin);
+                    }
+                    else if (newRole == UserRole.Engineer)
+                    {
+                        var engineer = new Engineers
+                        {
+                            Id = userId,
+                            FirstName = client.FirstName,
+                            LastName = client.LastName,
+                            Adress = null,
+                            WorkExp = "",
+                            AboutHimself = null,
+                            Requests = null
+                        };
+                        await _engineerRepo.CreateAsync(engineer);
+                    }
+
+                    await _clientRepo.DeleteAsync(userId);
+                }
+            }
+            else if (oldRole != UserRole.Client && newRole == UserRole.Client)
+            {
+                Client client = null;
+
+                if (oldRole == UserRole.Admin)
+                {
+                    var admin = await _repo.GetByIdAsync(userId);
+                    if (admin != null)
+                    {
+                        client = new Client
+                        {
+                            Id = userId,
+                            FirstName = admin.Name ?? "",
+                            LastName = "",
+                            QuantityOfVisits = 0,
+                            Requests = new List<Request>()
+                        };
+                        await _repo.DeleteAsync(userId);
+                    }
+                }
+                else if (oldRole == UserRole.Engineer)
+                {
+                    var engineer = await _engineerRepo.GetByIdAsync(userId);
+                    if (engineer != null)
+                    {
+                        client = new Client
+                        {
+                            Id = userId,
+                            FirstName = engineer.FirstName,
+                            LastName = engineer.LastName,
+                            QuantityOfVisits = 0,
+                            Requests = engineer.Requests
+                        };
+                        await _engineerRepo.DeleteAsync(userId);
+                    }
+                }
+
+                if (client != null)
+                {
+                    await _clientRepo.CreateAsync(client);
+                }
+            }
+
+            user.Role = newRole;
+            await _userRepo.UpdateAsync(user);
+        }
+
+        public async Task<UserDto> ChangeUserRoleAsync(int userId, UserRole newRole)
+        {
+            await UpdateRoleAsync(userId, newRole);
+            var updatedUser = await _userRepo.GetByIdAsync(userId);
+            return _mapper.Map<UserDto>(updatedUser);
         }
     }
 }

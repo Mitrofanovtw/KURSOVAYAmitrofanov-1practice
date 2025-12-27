@@ -64,5 +64,11 @@ namespace StudioStatistic.Services
             var created = await Task.Run(() => _requestRepo.Create(request));
             return _mapper.Map<RequestDto>(created);
         }
+
+        public async Task<List<RequestDto>> GetByClientIdAsync(int clientId)
+        {
+            var requests = await _requestRepo.GetByClientIdAsync(clientId);
+            return _mapper.Map<List<RequestDto>>(requests);
+        }
     }
 }

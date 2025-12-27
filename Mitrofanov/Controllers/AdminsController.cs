@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using StudioStatistic.Services;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using StudioStatistic.Models;
 using StudioStatistic.Models.DTO;
+using StudioStatistic.Repositories;
+using StudioStatistic.Services;
 
 namespace StudioStatistic.Controllers
 {
@@ -9,20 +13,26 @@ namespace StudioStatistic.Controllers
     public class AdminsController : ControllerBase
     {
         private readonly IAdminService _service;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public AdminsController(IAdminService service)
+        public AdminsController(IAdminService service, IUserRepository userRepository, IMapper mapper)
         {
             _service = service;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
         /// Получить всех админов (суперадмин)
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminDto>>> GetAll()
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<AdminDto>>> GetAllAdmins()
         {
-            var admins = await _service.GetAllAsync();
-            return Ok(admins);
+            var admins = await _userRepository.GetByRoleAsync(UserRole.Admin);
+            var adminDtos = _mapper.Map<List<AdminDto>>(admins);
+            return Ok(adminDtos);
         }
 
         /// <summary>

@@ -31,6 +31,12 @@ namespace StudioStatistic
         .ForMember(d => d.EngineerName, o => o.MapFrom(s => $"{s.Engineer.FirstName} {s.Engineer.LastName}"))
         .ForMember(d => d.ServiceName, o => o.MapFrom(s => s.Service.Name));
             CreateMap<CreateRequestDto, Request>();
+            CreateMap<Request, RequestDto>()
+    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<User, UserDto>();
+            CreateMap<User, AdminDto>();
+
         }
     }
 }

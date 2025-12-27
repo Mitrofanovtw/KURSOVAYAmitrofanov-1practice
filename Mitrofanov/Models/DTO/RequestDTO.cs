@@ -12,5 +12,6 @@
         public decimal Cost { get; set; }
         public DateTime DateOfVisit { get; set; }
         public string? Description { get; set; }
+        public string Status { get; set; } = "New";
     }
 }

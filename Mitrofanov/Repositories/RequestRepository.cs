@@ -24,5 +24,15 @@ namespace StudioStatistic.Repositories
                 .Include(r => r.Service)
                 .FirstOrDefault(r => r.Id == id);
         }
+
+        public async Task<List<Request>> GetByClientIdAsync(int clientId)
+        {
+            return await _context.Requests
+                .Include(r => r.Client)
+                .Include(r => r.Engineer)
+                .Include(r => r.Service)
+                .Where(r => r.ClientId == clientId)
+                .ToListAsync();
+        }
     }
 }

@@ -15,8 +15,6 @@ namespace StudioStatistic.Models
 
         [Required, MaxLength(150)]
         public string Adress { get; set; } = null!;
-
-        [Required, MaxLength(35)]
         public string WorkExp { get; set; } = null!;
 
         [MaxLength(200)]

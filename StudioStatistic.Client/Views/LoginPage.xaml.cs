@@ -9,4 +9,8 @@ public partial class LoginPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    private void OnEntryFocused(object sender, FocusEventArgs e)
+    {
+    }
 }
